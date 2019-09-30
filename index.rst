@@ -5,55 +5,21 @@
 |Home_Icon|_
 `Learning Center Home <http://learning.cyverse.org/>`_
 
-**QUICKSTART NAME**
-===================
-
-..
-    #### Comment: Use short, imperative titles e.g. Upload and share data, uploading and
-    sharing data ####
+**How to Integrate a Tool in DE**
+=================================
 
 Goal
 ----
-
-..
-    Avoid covering upstream and downstream steps that are not explicitly and
-    necessarily part of the tutorial - write or link to separate quick
-    starts/tutorials for those parts
-
-..
-    #### Comment: A few sentences (50 words or less) describing the ultimate goal of the steps
-    in this tutorial ####
-
-----
-
-.. toctree::
-	:maxdepth: 2
-
-	Quickstart home <self>
-	Step Two <step2.rst>
-	Delete this example guide page <example_directives_delete.rst>
-..
-	#### Comment:This tutorial can have multiple pages. The table of contents assumes
-	you have an additional page called 'Step Two' with content located in 'step2.rst'
-	Edit these titles and filenames as needed ####
-
-..
-    #### Comment: If you are using the TOC remove the 'summary', 'Additional information,
-    help' and 'Fix or improve this tutorial' from all pages except the last page of the
-    quickstart ####
-
------
+This tutorial will help you understand the process and how a tool can be integrated in the
+Discovery Environment using Github and Docker.
 
 Prerequisites
 -------------
-
-
 
 Downloads, access, and services
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 *In order to complete this tutorial you will need access to the following services/software*
-
 
  .. list-table::
    :header-rows: 1
@@ -64,20 +30,14 @@ Downloads, access, and services
    * - CyVerse account
      - You will need a CyVerse account to complete this exercise
      - |CyVerse User Portal|
-   * - Atmosphere access
-     - You must have access to Atmosphere
-     - |CyVerse User Portal|
-   * - Cyberduck
-     - Standalone software for upload/download to Data Store
-     - |Download Cyberduck|
+   * - Docker account
+     - You need your docker account to add the tool to your docker account
+     - `Docker login Portal <https://id.docker.com/login//>`_
 
 Platform(s)
 ~~~~~~~~~~~
 
 *We will use the following CyVerse platform(s):*
-
- ..
-   #### comment: delete any row not needed in this table ####
 
 .. list-table::
     :header-rows: 1
@@ -87,41 +47,11 @@ Platform(s)
       - Link
       - Platform Documentation
       - Quick Start
-    * - Data Store
-      - GUI/Command line
-      - |Data Store|
-      - |Data Store Manual|
-      - |Data Store Guide|
     * - Discovery Environment
       - Web/Point-and-click
       - |Discovery Environment|
       - |DE Manual|
       - |Discovery Environment Guide|
-    * - Atmosphere
-      - Command line (ssh) and/or Desktop (VNC)
-      - |Atmosphere|
-      - |Atmosphere Manual|
-      - |Atmosphere Guide|
-    * - BisQue
-      - Web/Point-and-click and/or Command-line (API)
-      - |BisQue|
-      - |BisQue Manual|
-      - (See Manual)
-    * - DNA Subway
-      - Web/Point-and-click
-      - |DNA Subway|
-      - (See Guide)
-      - |DNA Subway Guide|
-    * - SciApps
-      - Command-line (API)
-      - |SciApps|
-      - (See Guide)
-      - |SciApps Guide|
-    * - Agave API
-      - Command-line (API)
-      - |Agave API|
-      - |Agave Live Docs|
-      - (See Live Docs)
 
 Input and example data
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -142,28 +72,115 @@ Input and example data
 
 ----
 
+*Steps to Follow*
+-----------------
 
-*Get started*
---------------
+1. Create a docker container that contains your tool
 
-1. Step one
-2. Step two
+ 1.1 You can create docker container by first downloading docker on your machine
 
-----
+ 1.2 To check if docker is installed type docker help in command line or terminal
 
+ .. code-block:: bash
+
+     docker help
+
+2. Once docker displays all the commands it means that it is working
+
+ 2.1 Now create a folder in your machine and then create the "Dockerfile"
+
+ .. code-block:: bash
+
+     mkdir Rstudio-docker && cd Rstudio-docker
+     nano Dockerfile
+
+ 2.2 Dockerfile is the basic text file that will be the base of your docker image. So here is an example of Rstudio "Dockerfile"
+
+ .. code-block:: bash
+
+    FROM rocker/rstudio:3.5.2
+
+    RUN apt-get update \
+    && apt-get install -y lsb wget apt-transport-https python2.7 python-requests curl supervisor nginx gnupg2
+
+    RUN wget -qO - https://packages.irods.org/irods-signing-key.asc | apt-key add - \
+    && echo "deb [arch=amd64] https://packages.irods.org/apt/ xenial main" > /etc/apt/sources.list.d/renci-irods.list \
+    && apt-get update \
+    && apt-get install -y irods-icommands
+
+    ADD https://github.com/hairyhenderson/gomplate/releases/download/v2.5.0/gomplate_linux-amd64 /usr/bin/gomplate
+    RUN chmod a+x /usr/bin/gomplate
+
+    COPY run.sh /usr/local/bin/run.sh
+    COPY nginx.conf.tmpl /nginx.conf.tmpl
+    COPY rserver.conf /etc/rstudio/rserver.conf
+    COPY supervisor-nginx.conf /etc/supervisor/conf.d/nginx.conf
+    COPY supervisor-rstudio.conf /etc/supervisor/conf.d/rstudio.conf
+
+    ENV REDIRECT_URL "http://localhost"
+    ENV PASSWORD "rstudio1"
+
+    RUN bash /etc/cont-init.d/userconf
+
+    ENTRYPOINT ["/usr/local/bin/run.sh"]
+
+
+
+ 2.3 Once you create the "Dockerfile", you need to build the container
+
+ .. code-block:: bash
+
+     docker build -t rstudio .
+
+ 2.4 Test the docker image by typing the following command
+
+ .. code-block:: bash
+
+     docker run rstudio
+
+
+
+ 2.5 Now tag the image with your dockerhub-username followed by the image name.
+
+ .. code-block:: bash
+
+    docker tag rstudio username/rstudio
+
+ 2.6 Now login and then push the container to DockerHub where it can be accessed by others
+
+  .. code-block:: bash
+
+      docker login -u username
+      docker push username/rstudio
+
+3. Login to the `discovery_environment <https://de.cyverse.org/de/>`_
+
+ 3.1 Go to Apps on the left hand corner
+
+|De app|
+
+ 3.2 Click on manage tools in the top ride side of the window
+
+ 3.3 Click on Tools --> Add tool
+
+|De create tool|
+
+ 3.4 Enter name you want to give your tool and fill the form with the required fields
+
+|De tool name|
 
 
 *Summary*
 ~~~~~~~~~~~
 
-
 **Next Steps:**
 
+The above tutorial can be repeated to add tools of your choice by just replacing certain
+like container name, login id , tool name.
 Some common next steps include:
 
-1. Step
+1. Always have a Dockerfile before trying to build your container
 
-2. Step
 
 ----
 
@@ -207,6 +224,11 @@ Post your question to the user forum:
     :width: 25
     :height: 25
 
+.. |De app| image:: ./img/apps.png
+
+.. |De create tool| image:: ./img/imgrstudio.png
+
+.. |De tool name| image:: ./img/imgrstudio2.png
 
 
 .. Comment: Place URLS Below This Line
