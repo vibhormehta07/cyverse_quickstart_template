@@ -150,15 +150,18 @@ Platform(s)
 
 |De create tool|
 
-+------------+---------+
-| Type       | Port    |
-+------------+---------+
-| Jupyter    | 8888    |
-+------------+---------+
-| Rstudio    | 80      |
-+------------+---------+
-| Shiny      | 3838    |
-+------------+---------+
+3.5 Below are specific ports for vice tools in DE which need to be entered as ENTRYPOINTS based on the tool you are creating.
+
+
+  +------------+---------+
+  | Type       | Port    |
+  +------------+---------+
+  | Jupyter    | 8888    |
+  +------------+---------+
+  | Rstudio    | 80      |
+  +------------+---------+
+  | Shiny      | 3838    |
+  +------------+---------+
 
 
 *Summary*
