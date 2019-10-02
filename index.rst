@@ -151,16 +151,16 @@ Platform(s)
 |De create tool|
 
 .. list-table::
-  :header-rows: 1
+    :header-rows: 1
 
- *-Type
-  -Port
- *-Jupyter
-  -Rstudio
-  -Shiny
- *-8888
-  -80
-  -3838
+    -Type
+    -Port
+    -Jupyter
+    -Rstudio
+    -Shiny
+    -8888
+    -80
+    -3838
 
 *Summary*
 ~~~~~~~~~~~
