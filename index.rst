@@ -150,20 +150,16 @@ Platform(s)
 
 |De create tool|
 
++------------+---------+
+| Type       | Port    |
++------------+---------+
+| Jupyter    | 8888    |
++------------+---------+
+| Rstudio    | 80      |
++------------+---------+
+| Shiny      | 3838    |
++------------+---------+
 
-
-
-*.. list-table::
-    :header-rows: 1
-
-    -Type
-    -Port
-    -Jupyter
-    -Rstudio
-    -Shiny
-    -8888
-    -80
-    -3838
 
 *Summary*
 ~~~~~~~~~~~
